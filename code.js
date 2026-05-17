@@ -10,8 +10,8 @@ let cmdPrompt;
 
 input.focus();
 
-function setPrompt(directory = '/', user = 'user') {
-  cmdPrompt = `user@${hostname}:~${directory}$ `;
+function setPrompt(directoryOrPrompt = '/', userOrRaw = 'user') {
+  cmdPrompt = userOrRaw === true ? directoryHandle : `user@${hostname}:~${directoryOrPrompt}$ `;
   promptElm.innerText = cmdPrompt;
 }
 
@@ -73,7 +73,7 @@ let commands = {
   help: {
     description: 'Shows all commands',
     run: args => {
-      for (const [command, info] of Object.entries(commands)) {
+      for (const [command, info] of Object.entries(fullCommands())) {
         print(`${command} - ${info.description || 'Unknown'}`);
       }
     }
@@ -225,15 +225,19 @@ let commands = {
   },
 };
 
-let package = []
+let packages = {}
+
+const fullCommands = () => { return { ...Object.assign({}, ...Object.values(packages)), ...commands }; };
 
 async function load(package, name) {
-  const config = JSON5.parse(await package.text());
-  //const name = package.match(/([^/]+?)(?:\.[^.]+)?$/)[1];
+  const package = JSON5.parse(await package.text());
 
-  commands[name] = {};
-  commands[name].description = config.description;
-  commands[name].run = eval(config.run);
+  for (command of Object.values(package)) {
+    packages[name] = {};
+    packages[name][command] = {};
+    packages[name][command].description = command.description;
+    packages[name][command].run = eval(command.run);
+  }
 };
 
 async function process(raw) {
@@ -244,8 +248,8 @@ async function process(raw) {
   print(`${cmdPrompt}${raw}`);
 
   if (command) {
-    if (commands[command]) {
-      commands[command].run(args);
+    if (fullCommands()[command]) {
+      fullCommands()[command].run(args);
     } else {
       print(`Unrecognized command '${command}'`, 'error');;
     }
@@ -286,7 +290,7 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
 
     const text = input.value;
-    const matches = Object.keys(commands).filter(name =>
+    const matches = Object.keys(fullCommands()).filter(name =>
       name.startsWith(text)
     );
 
