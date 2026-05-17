@@ -4,13 +4,13 @@
 async (args) => {\
     const text = args.join(' ');\
 \
-    print(` ${'_'.repeat(text.length + 2)}\
-< ${text} >\
- ${'-'.repeat(text.length + 2)}\
-        \\   ^__^\
-         \\  (oo)\\_______\
-            (__)\\       )\\/\\\
-                ||----w |\
-                ||     ||`);\
+    print(` ${'_'.repeat(text.length + 2)}`);\
+    print(`< ${text} >`);\
+    print(` ${'-'.repeat(text.length + 2)}`);\
+    print('        \\   ^__^');\
+    print('         \\  (oo)\\_______');\
+    print('            (__)\\       )\\/\\');\
+    print('                ||----w |');\
+    print('                ||     ||');\
 }",
 }
