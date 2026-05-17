@@ -37,6 +37,8 @@ print(`Run 'help' for more help,`);
 print(`Run 'ws' to set the workspace,`);
 print(`And run 'neofetch' because it's awesome.`);
 print(` `)
+print(`... or do 'apt-get cowsay' for [a liter version of] cowsay`);
+print(` `)
 
 let commands = {
   /* =========================================== */
