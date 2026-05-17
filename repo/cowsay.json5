@@ -1,5 +1,6 @@
-{
+{cowsay: {
   description: "A generic test command",
+  permissions: "user",
   run: "\
 async (args) => {\
     const text = args.join(' ');\
@@ -12,5 +13,4 @@ async (args) => {\
     print(String.raw`            (__)\\       )\\/\\ `);\
     print(String.raw`                ||----w |`);\
     print(String.raw`                ||     ||`);\
-}",
-}
+}"}}

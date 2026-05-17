@@ -1,7 +1,7 @@
-{
+{chat-init: {
   description: "A generic test command",
+  permissions: "root",
   run: "\
 async (args) => {\
   print('success');\
-}",
-}
+}"}}
