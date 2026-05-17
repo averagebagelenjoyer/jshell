@@ -1,0 +1,8 @@
+{
+  description: 'A generic test command',
+  run: `
+    async (args) => {
+      print('success');
+    }
+  `
+}
