@@ -1,0 +1,20 @@
+* {
+    font-family: monospace;
+    color: white;
+    background-color: black;
+    cursor: default;
+}
+
+input {
+    border: none;
+    outline: none;
+    width: 80%;
+}
+
+.log {
+    white-space: pre-wrap;
+}
+
+.log-error {
+    color: red;
+}
