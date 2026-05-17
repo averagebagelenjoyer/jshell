@@ -230,13 +230,13 @@ let packages = {}
 const fullCommands = () => { return { ...Object.assign({}, ...Object.values(packages)), ...commands }; };
 
 async function load(package, name) {
-  const package = JSON5.parse(await package.text());
+  package = JSON5.parse(await package.text());
 
-  for (command of Object.values(package)) {
+  for (const [name, command] of Object.entries(package)) {
     packages[name] = {};
-    packages[name][command] = {};
-    packages[name][command].description = command.description;
-    packages[name][command].run = eval(command.run);
+    packages[name][name] = {};
+    packages[name][name].description = command.description;
+    packages[name][name].run = eval(command.run);
   }
 };
 
