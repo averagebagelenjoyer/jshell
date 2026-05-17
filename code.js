@@ -33,8 +33,9 @@ function print(text, type = 'default', raw = false) {
   });
 }
 
-print(`Run 'ws' to set the workspace`);
-print(`Run 'help' for more help`);
+print(`Run 'help' for more help,`);
+print(`Run 'ws' to set the workspace,`);
+print(`And run 'neofetch' because it's awesome.`);
 print(` `)
 
 let commands = {
@@ -96,6 +97,11 @@ let commands = {
     description: 'Echoes a string',
     run: args => {
       print(args.join(' '));
+    }
+  },
+  randomtestingcommand: {
+    run: args => {
+      print(args);
     }
   },
   /* ===================================== */
@@ -229,7 +235,9 @@ async function load(package, name) {
 };
 
 async function process(raw) {
-  const [command, ...args] = raw.split(' ');
+  const [command, ...args] = raw.match(/"([^"]*)"|[^\s"]+/g)
+    .map(t => t.replace(/^"|"$/g, ""));
+
   input.value = ''
   print(`${cmdPrompt}${raw}`);
 
