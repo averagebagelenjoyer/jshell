@@ -3,5 +3,5 @@
   run: "\
 async (args) => {\
   print('success');\
-}"
+}",
 }

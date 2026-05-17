@@ -1,0 +1,16 @@
+{
+  description: "A generic test command",
+  run: "\
+async (args) => {\
+    const text = args.join(' ');\
+\
+    print(` ${'_'.repeat(text.length + 2)}\
+< ${text} >\
+ ${'-'.repeat(text.length + 2)}\
+        \\   ^__^\
+         \\  (oo)\\_______\
+            (__)\\       )\\/\\\
+                ||----w |\
+                ||     ||`);\
+}",
+}
