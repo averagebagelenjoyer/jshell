@@ -1,13 +1,21 @@
 const input = document.getElementById('input');
 const logContainer = document.getElementById('log-container');
 const hostname = 'jshell';
-const cmdPrompt = `user@${hostname}$ `; document.getElementById('prompt').innerText = cmdPrompt;
 const startup = Date.now();
+const promptElm = document.getElementById('prompt');
 let history = [];
 let historyIndex = -1;
 let directoryHandle;
+let cmdPrompt;
 
 input.focus();
+
+function setPrompt(directory = '/', user = 'user') {
+    cmdPrompt = `user@${hostname}:~${directory}$ `;
+    promptElm.innerText = cmdPrompt;
+}
+
+setPrompt();
 
 function print(text, type = 'default', raw = false) {
     const log = document.createElement('div');
@@ -127,6 +135,7 @@ const commands = {
         run: async args => {
             directoryHandle = await window.showDirectoryPicker();
             print(`Successfully connected to filesystem '${directoryHandle.name}'`);
+            setPrompt(`/${directoryHandle.name}`);
         }
     },
     ls: {
@@ -135,7 +144,7 @@ const commands = {
             if (directoryHandle) {
                 let fileList = [];
                 for await (const entry of directoryHandle.values()) {
-                    if (entry.kind === "file") {
+                    if (entry.kind === 'file') {
                         fileList.push(await entry.name);
                     }
                 }
@@ -169,9 +178,9 @@ const commands = {
                 if (args.length !== 0) {
                     const name = args.join(' ');
                     const fileHandle = await directoryHandle.getFileHandle(name);
+                    const file = await fileHandle.getFile();
 
-                    print(fileHandle);
-                    console.log(fileHandle);
+                    print(await file.text());
                 } else {
                     print('Not enough args', 'error');
                 }
