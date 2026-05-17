@@ -6,3 +6,5 @@ features:
 - a package manager
 - filesystem access and stuff
 - **neofetch**
+
+> _note to self: i'll add piping. soon. ish. maybe. AWDIOFGYUESIOJJGT_
