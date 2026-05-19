@@ -8,6 +8,29 @@ let historyIndex = -1;
 let directoryHandle;
 let cmdPrompt;
 
+const ANSI = {
+  0: 'reset',
+  1: 'font-weight:bold',
+  30: 'color:black',
+  31: 'color:red',
+  32: 'color:green',
+  33: 'color:yellow',
+  34: 'color:blue',
+  35: 'color:magenta',
+  36: 'color:cyan',
+  37: 'color:white',
+  90: 'color:gray',
+  91: 'color:lightcoral',
+  92: 'color:lightgreen',
+  93: 'color:lightyellow',
+  94: 'color:lightskyblue',
+  95: 'color:violet',
+  96: 'color:lightcyan',
+  97: 'color:white'
+};
+
+const PROTECTED_PACKAGES = ['hardcode', 'core'];
+
 input.focus();
 
 function setPrompt(directoryOrPrompt = '/', userOrRaw = 'user') {
@@ -17,13 +40,30 @@ function setPrompt(directoryOrPrompt = '/', userOrRaw = 'user') {
 
 setPrompt();
 
-function print(text, type = 'default', raw = false) {
+function print(text, type = 'default') {
   const log = document.createElement('div');
-  if (raw) {
-    log.innerHTML = text;
-  } else {
-    log.innerText = text;
-  }
+
+  text = text.replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+
+  text = text.replace(/\x1b\[(\d+(?:;\d+)*)m/g, (_, codes) => {
+    const styles = codes
+      .split(';')
+      .map(c => ANSI[c])
+      .filter(Boolean);
+
+    if (styles.length) {
+      open = true;
+      return `<span style="${styles.join(';')}">`;
+    }
+  });
+
+  log.innerHTML = text;
   log.classList.add(`log`);
   log.classList.add(`log-${type}`);
   logContainer.appendChild(log);
@@ -35,223 +75,116 @@ function print(text, type = 'default', raw = false) {
 
 print(`Run 'help' for more help,`);
 print(`Run 'ws' to set the workspace,`);
-print(`And run 'neofetch' because it's awesome.`);
+print(`\x1b[31mAnd run 'neofetch' because it's awesome.`);
 print(` `)
 print(`... or do 'apt-get cowsay' for [a liter version of] cowsay`);
 print(` `)
 
-let commands = {
-  /* =========================================== */
-  /* ==============[ random shit ]============== */
-  /* =========================================== */
-  clear: {
-    description: 'Clears the screen',
-    run: args => { logContainer.innerHTML = '' }
-  },
-  neofetch: {
-    description: 'Displays system info',
-    run: args => {
-      print( /*pad*/  `              user@${hostname}`);
-      print(String.raw`    ___       -----`);
-      print(String.raw`   |\  \      OS: ${navigator.userAgentData.platform || 'Unknown'}`);
-      print(String.raw`   \ \  \     Shell: JShell`);
-      print(String.raw` __ \ \  \    User Agent: ${navigator.userAgent}`);
-      print(String.raw`|\  \\_\  \   Resolution: ${window.innerWidth}x${window.innerHeight}`);
-      print(String.raw`\ \________\  CPU: ${navigator.hardwareConcurrency} cores`);
-      print(String.raw` \|________|  Color Depth: ${screen.colorDepth}`);
-      print(String.raw`              Memory: ${navigator.deviceMemory} GB`);
-      print( /*pad*/  `              \
-<span style='color:red'>██</span>\
-<span style='color:green'>██</span>\
-<span style='color:yellow'>██</span>\
-<span style='color:blue'>██</span>\
-<span style='color:magenta'>██</span>\
-<span style='color:cyan'>██</span>\
-<span style='color:white'>██</span>`, 'default', true)
-    }
-  },
-  help: {
-    description: 'Shows all commands',
-    run: args => {
-      for (const [command, info] of Object.entries(fullCommands())) {
-        print(`${command} - ${info.description || 'Unknown'}`);
-      }
-    }
-  },
-  exec: {
-    description: 'Executes inline Javascript',
-    run: async args => {
-      if (args.length !== 0) {
-        const code = args.join(' ');
 
-        try {
-          const result = await eval(code);
-          print(result);
-        } catch (error) {
-          print(error, 'error');
-        }
-      } else {
-        print('Not enough args', 'error');
+let packages = {
+  hardcode: {
+    echo: {
+      description: 'Echoes a string',
+      run: args => {
+        print(args.join(' '));
       }
-    }
-  },
-  echo: {
-    description: 'Echoes a string',
-    run: args => {
-      print(args.join(' '));
-    }
-  },
-  randomtestingcommand: {
-    run: args => {
-      print(args);
-    }
-  },
-  /* ===================================== */
-  /* ==============[ utils ]============== */
-  /* ===================================== */
-  uptime: {
-    description: 'Returns the uptime (in seconds)',
-    run: args => {
-      print(`${(Date.now() - startup) / 1000} seconds`);
-    }
-  },
-  ping: {
-    description: 'Pings a website',
-    run: async args => {
-      if (args.length !== 0) {
-        let url = args.join(' ');
-        url = /^(https?|ftp|wss?):\/\//i.test(url) ? url : 'https://' + url;
+    },
+    aptget: {
+      description: 'Downloads a given package',
+      run: async args => {
+        const package = args.join(' ');
 
-        print('pinging...');
+        print('Checking...');
 
-        try {
-          await fetch(url, { method: 'GET', mode: 'no-cors' });
-          print('online');
-        } catch (e) {
-          print('offline');
+        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.json5`);
+
+        if (!result.ok) {
+          print('Package not found', 'error');
+          return;
         }
-      } else {
-        print('Not enough args', 'error');
+
+        print('Found!');
+        print('Downloading...');
+
+        await load(result, package);
+
+        print('Finished!');
       }
-    }
-  },
-  /* ========================================== */
-  /* ==============[ filesystem ]============== */
-  /* ========================================== */
-  ws: {
-    description: 'Sets the workspace',
-    run: async args => {
-      try {
-        directoryHandle = await window.showDirectoryPicker();
-        setPrompt(`/${directoryHandle.name}`);
-      } catch { }
-    }
-  },
-  ls: {
-    description: 'Lists files in a folder',
-    run: async args => {
-      if (directoryHandle) {
-        let fileList = [];
-        for await (const entry of directoryHandle.values()) {
-          if (entry.kind === 'file') {
-            fileList.push(await entry.name);
-          }
+    },
+    aptunget: {
+      description: 'Deletes a given package',
+      run: args => {
+        const package = args.join(' ');
+
+        if (PROTECTED_PACKAGES.includes(package)) {
+          print(`'${package}' is a protected package`, 'error');
+          return;
         }
-        print(fileList.join('  '));
-      } else {
-        print('Requires a workspace', 'error');
-      }
-    }
-  },
-  touch: {
-    description: 'Creates a blank file',
-    run: async args => {
-      if (directoryHandle) {
-        if (args.length !== 0) {
-          const name = args.join(' ');
-          const fileHandle = await directoryHandle.getFileHandle(name, { create: true });
-          const writable = await fileHandle.createWritable();
-          await writable.close();
+
+        if (packages.includes(package)) {
+          delete packages.package;
+          print(`Successfully deleted '${package}'`);
         } else {
-          print('Not enough args', 'error');
+          print('Package not found', 'error');
         }
-      } else {
-        print('Requires a workspace', 'error');
       }
-    }
-  },
-  cat: {
-    description: 'Lists files in a folder',
-    run: async args => {
-      if (directoryHandle) {
-        if (args.length !== 0) {
-          const name = args.join(' ');
-          const fileHandle = await directoryHandle.getFileHandle(name);
-          const file = await fileHandle.getFile();
-
-          print(await file.text());
-        } else {
-          print('Not enough args', 'error');
-        }
-      } else {
-        print('Requires a workspace', 'error');
-      }
-    }
-  },
-  /* =============================================== */
-  /* ==============[ package manager ]============== */
-  /* =============================================== */
-  'apt-get': {
-    description: "Downloads a given package",
-    run: async args => {
-      const package = args.join(' ');
-
-      print('Checking...');
-
-      const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.json5`);
-
-      if (!result.ok) {
-        print('Package not found', 'error');
-        return;
-      }
-
-      print('Found!');
-      print('Downloading...');
-
-      await load(result, package);
-
-      print('Finished!');
-    }
-  },
-};
-
-let packages = {}
-
-const fullCommands = () => { return { ...Object.assign({}, ...Object.values(packages)), ...commands }; };
-
-async function load(package, name) {
-  package = JSON5.parse(await package.text());
-
-  for (const [name, command] of Object.entries(package)) {
-    packages[name] = {};
-    packages[name][name] = {};
-    packages[name][name].description = command.description;
-    packages[name][name].run = eval(command.run);
+    },
   }
+}
+
+const commands = () => { return { ...Object.assign({}, ...Object.values(packages)) }; };
+
+async function load(package, name, system = false) {
+  if (PROTECTED_PACKAGES.includes(name) && !system) {
+    return;
+  }
+  const functions = package.match(/^(async )?function.*?\n}/gms);
+
+  packages[name] = {};
+
+  for (const func of functions) {
+    const funcName = func.match(/(?<=^async function |^function )([a-zA-Z0-9]+)/)[0];
+    const description = func.match(/^ *\/\/DESCRIPTION=(.*)/m);
+
+    packages[name][funcName] = {};
+    if (description) {
+      packages[name][funcName].description = description[1];
+    }
+    packages[name][funcName].run = eval(system ? `(${func})` : `
+(args) => {
+  const blob = new Blob([\`
+onmessage = (args) => {
+  (${func.replace(/[\\`$]/g, '\\$&')})();
 };
+\`], { type: 'application/javascript' });
+
+  const worker = new Worker(URL.createObjectURL(blob));
+
+  worker.onmessage = (event) => {
+    process(event.data);
+    console.log(event.data);
+  };
+
+  worker.postMessage(args);
+};
+`);
+  }
+}
+
+(async () => {
+  const result = await fetch('https://averagebagelenjoyer.github.io/jshell/repo/core.js');
+  const code = await result.text();
+  load(code, 'core', true);
+})();
 
 async function process(raw) {
-  const [command, ...args] = raw.match(/"([^"]*)"|[^\s"]+/g)
-    .map(t => t.replace(/^"|"$/g, ""));
-
-  input.value = ''
-  print(`${cmdPrompt}${raw}`);
+  const [command, ...args] = raw;
 
   if (command) {
-    if (fullCommands()[command]) {
-      fullCommands()[command].run(args);
+    if (commands().hasOwnProperty(command)) {
+      commands()[command].run(args);
     } else {
-      print(`Unrecognized command '${command}'`, 'error');;
+      print(`Unrecognized command '${command}'`, 'error');
     }
   }
 }
@@ -264,7 +197,13 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     history.push(input.value);
     historyIndex = history.length;
-    process(input.value);
+
+    print(`${cmdPrompt}${input.value}`);
+
+    process(input.value.match(/'([^']*)'|[^\s']+/g)
+      .map(t => t.replace(/^'|'$/g, '')));
+
+    input.value = '';
   }
 
   if (event.key === 'ArrowUp') {
@@ -290,7 +229,7 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
 
     const text = input.value;
-    const matches = Object.keys(fullCommands()).filter(name =>
+    const matches = Object.keys(commands()).filter(name =>
       name.startsWith(text)
     );
 
