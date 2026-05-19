@@ -29,7 +29,7 @@ const ANSI = {
   97: 'color:white'
 };
 
-const PROTECTED_PACKAGES = ['hardcode', 'core'];
+const PROTECTED_PACKAGES = ['hardcode', 'core', 'core-fs'];
 
 input.focus();
 
@@ -40,7 +40,7 @@ function setPrompt(directoryOrPrompt = '/', userOrRaw = 'user') {
 
 setPrompt();
 
-function print(text, type = 'default') {
+function print(text) {
   const log = document.createElement('div');
 
   text = text.replace(/[&<>"']/g, c => ({
@@ -48,7 +48,7 @@ function print(text, type = 'default') {
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#39;'
+    "'": '&#39;',
   }[c]));
 
   text = text.replace(/\x1b\[(\d+(?:;\d+)*)m/g, (_, codes) => {
@@ -63,6 +63,14 @@ function print(text, type = 'default') {
     }
   });
 
+  const clearRegex = /.*\x1b\[c/;
+
+  if (clearRegex.test(text)) {
+    text = text.replace(clearRegex, '');
+
+    logContainer.innerHTML = '';
+  }
+
   log.innerHTML = text;
   log.classList.add(`log`);
   log.classList.add(`log-${type}`);
@@ -75,7 +83,7 @@ function print(text, type = 'default') {
 
 print(`Run 'help' for more help,`);
 print(`Run 'ws' to set the workspace,`);
-print(`\x1b[31mAnd run 'neofetch' because it's awesome.`);
+print(`And run 'neofetch' because it's awesome.`);
 print(` `)
 print(`... or do 'apt-get cowsay' for [a liter version of] cowsay`);
 print(` `)
@@ -83,6 +91,14 @@ print(` `)
 
 let packages = {
   hardcode: {
+    help: {
+      description: 'Shows all commands',
+      run: args => {
+        for (const [command, info] of Object.entries(commands())) {
+          print(`${command} - ${info.description || 'Unknown'}`);
+        }
+      }
+    },
     echo: {
       description: 'Echoes a string',
       run: args => {
@@ -96,17 +112,17 @@ let packages = {
 
         print('Checking...');
 
-        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.json5`);
+        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.js`);
 
         if (!result.ok) {
-          print('Package not found', 'error');
+          print('\x1b[31mPackage not found');
           return;
         }
 
         print('Found!');
         print('Downloading...');
 
-        await load(result, package);
+        await load(await result.text(), package);
 
         print('Finished!');
       }
@@ -125,7 +141,7 @@ let packages = {
           delete packages.package;
           print(`Successfully deleted '${package}'`);
         } else {
-          print('Package not found', 'error');
+          print('\x1b[31mPackage not found');
         }
       }
     },
@@ -184,7 +200,7 @@ async function process(raw) {
     if (commands().hasOwnProperty(command)) {
       commands()[command].run(args);
     } else {
-      print(`Unrecognized command '${command}'`, 'error');
+      print(`\x1b[31mUnrecognized command '${command}'`);
     }
   }
 }
@@ -200,8 +216,12 @@ document.addEventListener('keydown', (event) => {
 
     print(`${cmdPrompt}${input.value}`);
 
+    try {
     process(input.value.match(/'([^']*)'|[^\s']+/g)
       .map(t => t.replace(/^'|'$/g, '')));
+  } catch {
+
+  }
 
     input.value = '';
   }

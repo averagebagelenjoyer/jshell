@@ -1,13 +1,13 @@
 // IS A SYSTEM PACKAGE
 // ---
-// system packages use `process` instead of `postMessage`, have more capabilities, and should not be used as a reference
+// System packages have more capabilities, and use slightly different formatting. These should not be used as a reference.
 
-function clear() {
+function clear(args) {
   //DESCRIPTION=Clears the screen
   process(['echo', '\x1b[c']);
 }
 
-function neofetch() {
+function neofetch(args) {
   //DESCRIPTION=Displays system info
   process(['echo', /*pad*/   `              user@${hostname}`]);
   process(['echo', String.raw`    ___       -----`]);
@@ -21,7 +21,7 @@ function neofetch() {
   process(['echo', /*pad*/   `              \x1b[31m██\x1b[32m██\x1b[33m██\x1b[34m██\x1b[35m██\x1b[36m██\x1b[37m██`]);
 }
 
-async function exec() {
+async function exec(args) {
   //DESCRIPTION=Executes inline Javascript
   if (args.length !== 0) {
     const code = args.join(' ');
@@ -37,12 +37,12 @@ async function exec() {
   }
 }
 
-function exit() {
+function exit(args) {
   //DESCRIPTION=Exits the shell
   window.close();
 }
 
-function uptime() {
+function uptime(args) {
   //DESCRIPTION=Returns the uptime (in seconds)
   process(['echo', `${(Date.now() - startup) / 1000} seconds`]);
 }
