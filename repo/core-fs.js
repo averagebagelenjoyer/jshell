@@ -1,4 +1,6 @@
-// System Package
+// IS A SYSTEM PACKAGE
+// ---
+// system packages use `process` instead of `postMessage`, have more capabilities, and should not be used as a reference
 
 function ws() {
   //DESCRIPTION=Sets the workspace
@@ -18,9 +20,9 @@ function ls() {
           fileList.push(await entry.name);
         }
       }
-      postMessage(['echo', fileList.join('  ')]);
+      process(['echo', fileList.join('  ')]);
     } else {
-      postMessage(['echo', 'Requires a workspace', 'error']);
+      process(['echo', 'Requires a workspace', 'error']);
     }
   }
 }
@@ -35,10 +37,10 @@ function touch() {
         const writable = await fileHandle.createWritable();
         await writable.close();
       } else {
-        postMessage(['echo', 'Not enough args', 'error']);
+        process(['echo', 'Not enough args', 'error']);
       }
     } else {
-      postMessage(['echo', 'Requires a workspace', 'error']);
+      process(['echo', 'Requires a workspace', 'error']);
     }
   }
 }
@@ -52,12 +54,12 @@ function cat() {
         const fileHandle = await directoryHandle.getFileHandle(name);
         const file = await fileHandle.getFile();
 
-        postMessage(['echo', await file.text()]);
+        process(['echo', await file.text()]);
       } else {
-        postMessage(['echo', 'Not enough args', 'error']);
+        process(['echo', 'Not enough args', 'error']);
       }
     } else {
-      postMessage(['echo', 'Requires a workspace', 'error']);
+      process(['echo', 'Requires a workspace', 'error']);
     }
   }
 }
