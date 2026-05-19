@@ -16,10 +16,6 @@ Core packages for system
 A liter version of cowsay because HOLY **** WHY IS THIS REPO SO BIG  
 **Install:** `apt-get cowsay`
 
-### **Filesystem Utils**
-Utitilies for the filesystem, such as `ls`, `touch`, `cat`, etc  
-**Install:** `apt-get fs-util`
-
 ### **Network Utils**
 Utitilies for networking, currently only `ping`  
 **Install:** `apt-get network-util`
