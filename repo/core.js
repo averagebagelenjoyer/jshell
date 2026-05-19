@@ -25,7 +25,7 @@ function help(args) {
 }
 
 
-function exec(args) {
+async function exec(args) {
   //DESCRIPTION=Executes inline Javascript
   if (args.length !== 0) {
     const code = args.join(' ');
