@@ -1,9 +1,11 @@
-function clear(args) {
+// System Package
+
+function clear() {
   //DESCRIPTION=Clears the screen
-  postMessage(['echo', 'clear'])
+  postMessage(['echo', '\x1b[c']);
 }
 
-function neofetch(args) {
+function neofetch() {
   //DESCRIPTION=Displays system info
   postMessage(['echo', /*pad*/   `              user@${hostname}`]);
   postMessage(['echo', String.raw`    ___       -----`]);
@@ -14,18 +16,17 @@ function neofetch(args) {
   postMessage(['echo', String.raw`\ \________\  CPU: ${navigator.hardwareConcurrency} cores`]);
   postMessage(['echo', String.raw` \|________|  Color Depth: ${screen.colorDepth}`]);
   postMessage(['echo', String.raw`              Memory: ${navigator.deviceMemory} GB`]);
-  postMessage(['echo', /*pad*/   `              \x1b[31m██\x1b[32m██\x1b[33m██\x1b[34m██\x1b[35m██\x1b[36m██\x1b[37m██`])
+  postMessage(['echo', /*pad*/   `              \x1b[31m██\x1b[32m██\x1b[33m██\x1b[34m██\x1b[35m██\x1b[36m██\x1b[37m██`]);
 }
 
-function help(args) {
+function help() {
   //DESCRIPTION=Shows all commands
   for (const [command, info] of Object.entries(fullCommands())) {
     postMessage(['echo', `${command} - ${info.description || 'Unknown'}`]);
   }
 }
 
-
-async function exec(args) {
+async function exec() {
   //DESCRIPTION=Executes inline Javascript
   if (args.length !== 0) {
     const code = args.join(' ');
@@ -41,12 +42,12 @@ async function exec(args) {
   }
 }
 
-function exit(args) {
+function exit() {
   //DESCRIPTION=Exits the shell
   window.close();
 }
 
-function uptime(args) {
+function uptime() {
   //DESCRIPTION=Returns the uptime (in seconds)
   postMessage(['echo', `${(Date.now() - startup) / 1000} seconds`]);
 }
