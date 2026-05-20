@@ -73,21 +73,12 @@ function print(text) {
 
   log.innerHTML = text;
   log.classList.add(`log`);
-  log.classList.add(`log-${type}`);
   logContainer.appendChild(log);
 
   window.scrollTo({
     top: document.body.scrollHeight
   });
 }
-
-print(`Run 'help' for more help,`);
-print(`Run 'ws' to set the workspace,`);
-print(`And run 'neofetch' because it's awesome.`);
-print(` `)
-print(`... or do 'apt-get cowsay' for [a liter version of] cowsay`);
-print(` `)
-
 
 let packages = {
   hardcode: {
@@ -137,8 +128,8 @@ let packages = {
           return;
         }
 
-        if (packages.includes(package)) {
-          delete packages.package;
+        if (package in packages) {
+          delete packages[package];
           print(`Successfully deleted '${package}'`);
         } else {
           print('\x1b[31mPackage not found');
@@ -188,9 +179,10 @@ onmessage = (args) => {
 }
 
 (async () => {
-  const result = await fetch('https://averagebagelenjoyer.github.io/jshell/repo/core.js');
-  const code = await result.text();
-  load(code, 'core', true);
+  for (const package of ['core', 'core-fs']) {
+    const code = await (await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.js`)).text();
+    load(code, package, true);
+  }
 })();
 
 async function process(raw) {
@@ -217,11 +209,11 @@ document.addEventListener('keydown', (event) => {
     print(`${cmdPrompt}${input.value}`);
 
     try {
-    process(input.value.match(/'([^']*)'|[^\s']+/g)
-      .map(t => t.replace(/^'|'$/g, '')));
-  } catch {
+      process(input.value.match(/'([^']*)'|[^\s']+/g)
+        .map(t => t.replace(/^'|'$/g, '')));
+    } catch {
 
-  }
+    }
 
     input.value = '';
   }

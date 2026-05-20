@@ -2,7 +2,7 @@
 // ---
 // system packages use `process` instead of `postMessage`, have more capabilities, and should not be used as a reference
 
-function ws() {
+async function ws() {
   //DESCRIPTION=Sets the workspace
   try {
     directoryHandle = await window.showDirectoryPicker();
@@ -10,7 +10,7 @@ function ws() {
   } catch { }
 }
 
-function ls() {
+async function ls() {
   //DESCRIPTION=Lists files in a folder
   run: async args => {
     if (directoryHandle) {
@@ -22,12 +22,12 @@ function ls() {
       }
       process(['echo', fileList.join('  ')]);
     } else {
-      process(['echo', 'Requires a workspace', 'error']);
+      process(['echo', '\x1b[31mRequires a workspace']);
     }
   }
 }
 
-function touch() {
+async function touch() {
   //DESCRIPTION=Creates a blank file
   run: async args => {
     if (directoryHandle) {
@@ -37,15 +37,15 @@ function touch() {
         const writable = await fileHandle.createWritable();
         await writable.close();
       } else {
-        process(['echo', 'Not enough args', 'error']);
+        process(['echo', '\x1b[31mNot enough args']);
       }
     } else {
-      process(['echo', 'Requires a workspace', 'error']);
+      process(['echo', '\x1b[31mRequires a workspace']);
     }
   }
 }
 
-function cat() {
+async function cat() {
   //DESCRIPTION=Lists files in a folder
   run: async args => {
     if (directoryHandle) {
@@ -56,10 +56,10 @@ function cat() {
 
         process(['echo', await file.text()]);
       } else {
-        process(['echo', 'Not enough args', 'error']);
+        process(['echo', '\x1b[31mNot enough args']);
       }
     } else {
-      process(['echo', 'Requires a workspace', 'error']);
+      process(['echo', '\x1b[31mRequires a workspace']);
     }
   }
 }
