@@ -7,6 +7,7 @@ let history = [];
 let historyIndex = -1;
 let directoryHandle;
 let cmdPrompt;
+let screenBuffer = '';
 
 const ANSI = {
   0: 'reset',
@@ -81,8 +82,27 @@ function print(text) {
   });
 }
 
+function flushBuffer() {
+  for (const line of screenBuffer.split('\n')) {
+    print(line);
+  }
+
+  screenBuffer = '';
+}
+
 let packages = {
   hardcode: {
+    echo: {
+      description: 'Echoes a string',
+      run: args => {
+        screenBuffer += `${args.join(' ')}\n`;
+      }
+    },
+    argtest: {
+      run: args => {
+        print(args.join(','));
+      }
+    },
     help: {
       description: 'Shows all commands',
       run: args => {
@@ -91,20 +111,14 @@ let packages = {
         }
       }
     },
-    echo: {
-      description: 'Echoes a string',
-      run: args => {
-        print(args.join(' '));
-      }
-    },
     aptget: {
       description: 'Downloads a given package',
       run: async args => {
-        const package = args.join(' ');
+        const pkg = args.join(' ');
 
         print('Checking...');
 
-        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.js`);
+        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${pkg}.js`);
 
         if (!result.ok) {
           print('\x1b[31mPackage not found');
@@ -114,7 +128,7 @@ let packages = {
         print('Found!');
         print('Downloading...');
 
-        await load(await result.text(), package);
+        await load(await result.text(), pkg);
 
         print('Finished!');
       }
@@ -122,16 +136,16 @@ let packages = {
     aptunget: {
       description: 'Deletes a given package',
       run: args => {
-        const package = args.join(' ');
+        const pkg = args.join(' ');
 
-        if (PROTECTED_PACKAGES.includes(package)) {
-          print(`'${package}' is a protected package`, 'error');
+        if (PROTECTED_PACKAGES.includes(pkg)) {
+          print(`'${pkg}' is a protected package`, 'error');
           return;
         }
 
-        if (package in packages) {
-          delete packages[package];
-          print(`Successfully deleted '${package}'`);
+        if (pkg in packages) {
+          delete packages[pkg];
+          print(`Successfully deleted '${pkg}'`);
         } else {
           print('\x1b[31mPackage not found');
         }
@@ -142,11 +156,11 @@ let packages = {
 
 const commands = () => { return { ...Object.assign({}, ...Object.values(packages)) }; };
 
-async function load(package, name, system = false) {
+async function load(pkg, name, system = false) {
   if (PROTECTED_PACKAGES.includes(name) && !system) {
     return;
   }
-  const functions = package.match(/^(async )?function.*?\n}/gms);
+  const functions = pkg.match(/^(async )?function.*?\n}/gms);
 
   packages[name] = {};
 
@@ -186,21 +200,33 @@ onmessage = (event) => {
 }
 
 (async () => {
-  for (const package of ['core', 'core-fs']) {
-    const code = await (await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${package}.js`)).text();
-    load(code, package, true);
+  for (const pkg of ['core', 'core-fs']) {
+    const code = await (await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${pkg}.js`)).text();
+    load(code, pkg, true);
   }
 })();
 
-async function process(raw) {
-  const [command, ...args] = raw;
+function splitList(list, delimiter) {
+  const out = [[]];
+  for (const item of list) {
+    item === delimiter ? out.push([]) : out[out.length - 1].push(item);
+  }
+  return out;
+}
 
-  if (command) {
-    if (commands().hasOwnProperty(command)) {
-      commands()[command].run(args);
-    } else {
-      print(`\x1b[31mUnrecognized command '${command}'`);
+async function process(raw) {
+  for (const rawCommand of splitList(raw, ';')) {
+    const [command, ...args] = rawCommand;
+
+    if (command) {
+      if (commands().hasOwnProperty(command)) {
+        commands()[command].run(args);
+      } else {
+        print(`\x1b[31mUnrecognized command '${command}'`);
+      }
     }
+
+    flushBuffer();
   }
 }
 
@@ -216,7 +242,7 @@ document.addEventListener('keydown', (event) => {
     print(`${cmdPrompt}${input.value}`);
 
     try {
-      process(input.value.match(/'([^']*)'|[^\s']+/g)
+      process(input.value.match(/'[^']*'|;|[^\s';]+/g) // absolute shit
         .map(t => t.replace(/^'|'$/g, '')));
     } catch {
 
