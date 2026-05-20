@@ -30,10 +30,10 @@ async function exec(args) {
       const result = await eval(code);
       process(['echo', result]);
     } catch (error) {
-      process(['echo', `\x1b[31m${error}`]);
+      process(['echo', 'stderr', `${error}`]);
     }
   } else {
-    process(['echo', '\x1b[31mNot enough args']);
+    process(['echo', 'stderr', 'Not enough args']);
   }
 }
 
