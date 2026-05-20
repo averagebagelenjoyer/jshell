@@ -30,6 +30,7 @@ const ANSI = {
 };
 
 const PROTECTED_PACKAGES = ['hardcode', 'core', 'core-fs'];
+const DANGEROUS_COMMANDS = ['exit', 'exec', 'cat', 'ls', 'touch', 'ws', 'aptget', 'aptunget'];
 
 input.focus();
 
@@ -160,16 +161,22 @@ async function load(package, name, system = false) {
     packages[name][funcName].run = eval(system ? `(${func})` : `
 (args) => {
   const blob = new Blob([\`
-onmessage = (args) => {
+onmessage = (event) => {
+  const args = event.data;
   (${func.replace(/[\\`$]/g, '\\$&')})();
+  console.log('Goodbye webworker, you will be missed 🫡');
+  self.close();
 };
 \`], { type: 'application/javascript' });
 
   const worker = new Worker(URL.createObjectURL(blob));
 
   worker.onmessage = (event) => {
-    process(event.data);
-    console.log(event.data);
+    const [command, ...args] = event.data;
+    
+    if (!DANGEROUS_COMMANDS.includes(command)) {
+      process([command, ...args]);
+    }
   };
 
   worker.postMessage(args);
