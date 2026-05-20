@@ -1,12 +1,29 @@
-> _yeah i know rn it's in a really shitty state, it should be fixed in a few days though_
+> A fully functional shell that runs in the browser, with sandboxed packages, networking tools, filesystem access, and more, with no installation. Plus it's universal, so it [should] work on all devices the same.
 
-a full working shell in html.
+Try it [here](https://averagebagelenjoyer.github.io/jshell/).
 
-don't believe me? okay then just... [click here](https://averagebagelenjoyer.github.io/jshell/).
-
-features:
+# Features
 - a package manager
-- filesystem access and stuff
+- piping (actually not yet but soon)
+- chained commands
+- filesystem access
+- networking tools
+- works on any OS with Chromium
+- no install
 - **neofetch**
 
-> _note to self: i'll add piping. soon. ish. maybe. AWDIOFGYUESIOJJGT_
+# Roadmap
+- [ ] improvements
+  - [ ] add <canvas/> for GUI applications
+  - [ ] better offline usage
+- [ ] increase package ecosystem
+  - [ ] Qalc
+  - [ ] Python
+  - [ ] file conversion
+
+# Why?
+Have you ever had to search around for a file converter, or even a damn basic calculator, and end up on some sketchy website which probably sells your data?  
+The point of this project is to ellimate that.
+1. It's universal, so it works everywhere
+2. It's offline, so you know your data is secure
+3. It's a shell, of course it's powerful
