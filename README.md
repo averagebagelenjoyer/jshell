@@ -1,6 +1,7 @@
 > A fully functional shell that runs in the browser, with sandboxed packages, networking tools, filesystem access, and more, with no installation. Plus it's universal, so it [should] work on all devices the same.
 
-Try it [here](https://averagebagelenjoyer.github.io/jshell/).
+Try it [here](https://averagebagelenjoyer.github.io/JShell/).  
+Or read the documentation for packages [here](https://github.com/averagebagelenjoyer/JShell/wiki).
 
 # Features
 - a package manager
