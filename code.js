@@ -8,6 +8,8 @@ let historyIndex = -1;
 let directoryHandle;
 let cmdPrompt;
 let screenBuffer = '';
+let promptHidden = false;
+let breakWithC = true;
 
 const ANSI = {
   0: 'reset',
@@ -108,6 +110,40 @@ let packages = {
       run: args => {
         for (const [command, info] of Object.entries(commands())) {
           print(`${command} - ${info.description || 'Unknown'}`);
+        }
+      }
+    },
+    hide: {
+      description: "Hides the prompt until shown with 'show'. Specify '-c' to disallow breaking out via Ctrl+C",
+      run: args => {
+        if (args.includes("-c")) {
+          breakWithC = false;
+        } else {
+          breakWithC = true;
+        }
+
+        promptElm.hidden = true;
+        input.hidden = true;
+        promptHidden = true;
+      }
+    },
+    show: {
+      description: "Shows the prompt if hidden",
+      run: args => {
+        promptElm.hidden = false;
+        input.hidden = false;
+        promptHidden = false;
+
+        input.focus();
+      }
+    },
+    wait: {
+      description: "Waits a specified amount of time in milliseconds",
+      run: async args => {
+        const duration = args[0];
+
+        if (Number.isFinite(Number(duration))) {
+          await new Promise(resolve => setTimeout(resolve, duration));
         }
       }
     },
@@ -220,7 +256,7 @@ async function process(raw) {
 
     if (command) {
       if (commands().hasOwnProperty(command)) {
-        commands()[command].run(args);
+        await commands()[command].run(args);
       } else {
         print(`\x1b[31mUnrecognized command '${command}'`);
       }
@@ -235,6 +271,15 @@ document.addEventListener('mouseup', () => {
 });
 
 document.addEventListener('keydown', (event) => {
+  if (promptHidden) {
+    if (breakWithC) {
+      if (event.ctrlKey && event.key === "c") {
+        process(['show']);
+      }
+    }
+    return;
+  }
+
   if (event.key === 'Enter') {
     history.push(input.value);
     historyIndex = history.length;
