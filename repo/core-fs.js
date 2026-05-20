@@ -19,7 +19,7 @@ async function ls() {
         fileList.push(await entry.name);
       }
     }
-    process(['echo', fileList.join('  ')]);
+    process(['echo', 'stdout', fileList.join('  ')]);
   } else {
     process(['echo', 'stderr', 'Requires a workspace']);
   }
@@ -49,7 +49,7 @@ async function cat() {
       const fileHandle = await directoryHandle.getFileHandle(name);
       const file = await fileHandle.getFile();
 
-      process(['echo', await file.text()]);
+      process(['echo', 'stdout', await file.text()]);
     } else {
       process(['echo', 'stderr', 'Not enough args']);
     }

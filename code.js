@@ -97,19 +97,28 @@ let packages = {
     echo: {
       description: 'Echoes a string',
       run: args => {
-        screenBuffer += `${args.join(' ')}\n`;
-      }
-    },
-    argtest: {
-      run: args => {
-        print(args.join(','));
+        const output = args[0];
+        const message = args.at(-1);
+
+        switch (output) {
+          case 'stdout':
+            screenBuffer += `${message}\n`;
+            break;
+
+          case 'stderr':
+            screenBuffer += `\x1b[31m${message}\n`;
+            break;
+
+          default:
+            screenBuffer += '\x1b[31mInvalid args\n';
+        }
       }
     },
     help: {
       description: 'Shows all commands',
       run: args => {
         for (const [command, info] of Object.entries(commands())) {
-          print(`${command} - ${info.description || 'Unknown'}`);
+          process(['echo', 'stdout', `${command} - ${info.description || 'Unknown'}`]);
         }
       }
     },
@@ -152,21 +161,21 @@ let packages = {
       run: async args => {
         const pkg = args.join(' ');
 
-        print('Checking...');
+        process(['echo', 'stdout', 'Checking...']);
 
         const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${pkg}.js`);
 
         if (!result.ok) {
-          print('\x1b[31mPackage not found');
+          process(['echo', 'stderr', 'Package not found']);
           return;
         }
 
-        print('Found!');
-        print('Downloading...');
+        process(['echo', 'stdout', 'Found!']);
+        process(['echo', 'stdout', 'Downloading...']);
 
         await load(await result.text(), pkg);
 
-        print('Finished!');
+        process(['echo', 'stdout', 'Finished!']);
       }
     },
     aptunget: {
@@ -175,15 +184,15 @@ let packages = {
         const pkg = args.join(' ');
 
         if (PROTECTED_PACKAGES.includes(pkg)) {
-          print(`'${pkg}' is a protected package`, 'error');
+          process(['echo', 'stderr', `'${pkg}' is a protected package`, 'error']);
           return;
         }
 
         if (pkg in packages) {
           delete packages[pkg];
-          print(`Successfully deleted '${pkg}'`);
+          process(['echo', 'stdout', `Successfully deleted '${pkg}'`]);
         } else {
-          print('\x1b[31mPackage not found');
+          process(['echo', 'stderr', 'Package not found']);
         }
       }
     },
@@ -258,7 +267,7 @@ async function process(raw) {
       if (commands().hasOwnProperty(command)) {
         await commands()[command].run(args);
       } else {
-        print(`\x1b[31mUnrecognized command '${command}'`);
+        process(['echo', 'error', `Unrecognized command '${command}'`]);
       }
     }
 

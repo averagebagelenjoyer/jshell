@@ -4,7 +4,7 @@ async function ping() {
     let url = args.join(' ');
     url = /^(https?|ftp|wss?):\/\//i.test(url) ? url : 'https://' + url;
 
-    postMessage(['echo', 'pinging...']);
+    postMessage(['echo', 'stdout', 'pinging...']);
 
     try {
       await fetch(url, { method: 'GET', mode: 'no-cors' });

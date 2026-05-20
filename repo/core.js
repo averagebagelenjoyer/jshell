@@ -4,21 +4,21 @@
 
 function clear(args) {
   //DESCRIPTION=Clears the screen
-  process(['echo', '\x1b[c']);
+  process(['echo', 'stdout', '\x1b[c']);
 }
 
 function neofetch(args) {
   //DESCRIPTION=Displays system info
-  process(['echo', /*pad*/   `              user@${hostname}`]);
-  process(['echo', String.raw`    ___       -----`]);
-  process(['echo', String.raw`   |\  \      OS: ${navigator.userAgentData.platform || 'Unknown'}`]);
-  process(['echo', String.raw`   \ \  \     Shell: JShell`]);
-  process(['echo', String.raw` __ \ \  \    User Agent: ${navigator.userAgent}`]);
-  process(['echo', String.raw`|\  \\_\  \   Resolution: ${window.innerWidth}x${window.innerHeight}`]);
-  process(['echo', String.raw`\ \________\  CPU: ${navigator.hardwareConcurrency} cores`]);
-  process(['echo', String.raw` \|________|  Color Depth: ${screen.colorDepth}`]);
-  process(['echo', String.raw`              Memory: ${navigator.deviceMemory} GB`]);
-  process(['echo', /*pad*/   `              \x1b[31m██\x1b[32m██\x1b[33m██\x1b[34m██\x1b[35m██\x1b[36m██\x1b[37m██`]);
+  process(['echo', 'stdout', /*pad*/   `              user@${hostname}`]);
+  process(['echo', 'stdout', String.raw`    ___       -----`]);
+  process(['echo', 'stdout', String.raw`   |\  \      OS: ${navigator.userAgentData.platform || 'Unknown'}`]);
+  process(['echo', 'stdout', String.raw`   \ \  \     Shell: JShell`]);
+  process(['echo', 'stdout', String.raw` __ \ \  \    User Agent: ${navigator.userAgent}`]);
+  process(['echo', 'stdout', String.raw`|\  \\_\  \   Resolution: ${window.innerWidth}x${window.innerHeight}`]);
+  process(['echo', 'stdout', String.raw`\ \________\  CPU: ${navigator.hardwareConcurrency} cores`]);
+  process(['echo', 'stdout', String.raw` \|________|  Color Depth: ${screen.colorDepth}`]);
+  process(['echo', 'stdout', String.raw`              Memory: ${navigator.deviceMemory} GB`]);
+  process(['echo', 'stdout', /*pad*/   `              \x1b[31m██\x1b[32m██\x1b[33m██\x1b[34m██\x1b[35m██\x1b[36m██\x1b[37m██`]);
 }
 
 async function exec(args) {
@@ -28,7 +28,7 @@ async function exec(args) {
 
     try {
       const result = await eval(code);
-      process(['echo', result]);
+      process(['echo', 'stdout',  result]);
     } catch (error) {
       process(['echo', 'stderr', `${error}`]);
     }
@@ -44,5 +44,5 @@ function exit(args) {
 
 function uptime(args) {
   //DESCRIPTION=Returns the uptime (in seconds)
-  process(['echo', `${(Date.now() - startup) / 1000} seconds`]);
+  process(['echo', 'stdout', `${(Date.now() - startup) / 1000} seconds`]);
 }
