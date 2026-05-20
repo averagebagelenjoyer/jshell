@@ -1,10 +1,10 @@
-function ping() {
+async function ping() {
   //DESCRIPTION=Pings a website
   if (args.length !== 0) {
     let url = args.join(' ');
     url = /^(https?|ftp|wss?):\/\//i.test(url) ? url : 'https://' + url;
 
-    print('pinging...');
+    postMessage(['echo', 'pinging...']);
 
     try {
       await fetch(url, { method: 'GET', mode: 'no-cors' });
@@ -13,7 +13,7 @@ function ping() {
       print('offline');
     }
   } else {
-    print('Not enough args', 'error');
+    postMessage(['echo', 'stderr', 'Not enough args']);
   }
 }
 
