@@ -2,6 +2,15 @@
 // ---
 // System packages have more capabilities, and use slightly different formatting. These should not be used as a reference.
 
+function man(args) {
+  //DESCRIPTION=Manual pages
+  const page = args[0]; // placeholder code
+
+  for (const [command, info] of Object.entries(commands())) {
+    process(['echo', 'stdout', `${command} - ${info.description || 'Unknown'}`]);
+  }
+}
+
 function clear(args) {
   //DESCRIPTION=Clears the screen
   process(['echo', 'stdout', '\x1b[c']);
