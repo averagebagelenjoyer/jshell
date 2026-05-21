@@ -264,7 +264,7 @@ function splitList(list, delimiter) {
 }
 
 async function process(raw) {
-  for (const rawCommand of splitList(raw, ';')) {
+  for (const rawCommand of splitList(raw, '&')) {
     const [command, ...args] = rawCommand;
 
     if (command) {
@@ -300,7 +300,7 @@ document.addEventListener('keydown', (event) => {
     print(`${cmdPrompt}${input.value}`);
 
     try {
-      process(input.value.match(/'[^']*'|;|[^\s';]+/g) // absolute shit
+      process(input.value.match(/'[^']*'|[^\s']+/g)
         .map(t => t.replace(/^'|'$/g, '')));
     } catch {
 
