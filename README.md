@@ -14,7 +14,7 @@ Or read the documentation for packages [here](https://github.com/averagebagelenj
 
 # Roadmap
 - [ ] improvements
-  - [ ] add <canvas/> for GUI applications
+  - [x] add <canvas/> for GUI applications
   - [ ] better offline usage
   - [ ] piping
 - [ ] increase package ecosystem
