@@ -5,7 +5,6 @@ Or read the documentation for packages [here](https://github.com/averagebagelenj
 
 # Features
 - a package manager
-- piping (actually not yet but soon)
 - chained commands
 - filesystem access
 - networking tools
@@ -17,6 +16,7 @@ Or read the documentation for packages [here](https://github.com/averagebagelenj
 - [ ] improvements
   - [ ] add <canvas/> for GUI applications
   - [ ] better offline usage
+  - [ ] piping
 - [ ] increase package ecosystem
   - [ ] Qalc
   - [ ] Python
