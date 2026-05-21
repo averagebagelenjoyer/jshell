@@ -1,4 +1,4 @@
-const REPOSITORY_PATH = 'repo/';
+const REPOSITORY_PATH = 'https://averagebagelenjoyer.github.io/JShell/repo';
 // set this to 'repo/' if you are testing local packages
 // default value: https://averagebagelenjoyer.github.io/JShell/repo
 
