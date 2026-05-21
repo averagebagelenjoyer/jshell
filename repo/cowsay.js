@@ -1,5 +1,6 @@
 function cowsay() {
   //DESCRIPTION=srsly why--
+  //USAGE=cowsay <string>
   const text = args.join(' ');
   postMessage(['echo', 'stdout', String.raw` ${'_'.repeat(text.length + 2)}`]);
   postMessage(['echo', 'stdout', String.raw`< ${text} >`]);

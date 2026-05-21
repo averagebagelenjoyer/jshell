@@ -4,6 +4,7 @@
 
 async function ws() {
   //DESCRIPTION=Sets the workspace
+  //USAGE=ws
   try {
     directoryHandle = await window.showDirectoryPicker();
     setPrompt(`/${directoryHandle.name}`);
@@ -12,6 +13,8 @@ async function ws() {
 
 async function ls() {
   //DESCRIPTION=Lists files in a folder
+  //MANUAL=As of now, it only lists the workspace you are currently in
+  //USAGE=ls
   if (directoryHandle) {
     let fileList = [];
     for await (const entry of directoryHandle.values()) {
@@ -27,6 +30,8 @@ async function ls() {
 
 async function touch() {
   //DESCRIPTION=Creates a blank file
+  //MANUAL=With a specified name
+  //USAGE=touch <name>
   if (directoryHandle) {
     if (args.length !== 0) {
       const name = args.join(' ');
@@ -42,7 +47,8 @@ async function touch() {
 }
 
 async function cat() {
-  //DESCRIPTION=Lists files in a folder
+  //DESCRIPTION=Prints text from a file
+  //USAGE=cat <file>
   if (directoryHandle) {
     if (args.length !== 0) {
       const name = args.join(' ');

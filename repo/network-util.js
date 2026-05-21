@@ -1,5 +1,6 @@
 async function ping() {
   //DESCRIPTION=Pings a website
+  //USAGE=ping <domain>
   if (args.length !== 0) {
     let url = args.join(' ');
     url = /^(https?|ftp|wss?):\/\//i.test(url) ? url : 'https://' + url;

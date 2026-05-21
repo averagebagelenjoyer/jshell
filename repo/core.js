@@ -4,20 +4,42 @@
 
 function man(args) {
   //DESCRIPTION=Manual pages
-  const page = args[0]; // placeholder code
+  //MANUAL=Gives in depth information about a particular command
+  //USAGE=man <command>
+  if (args.length !== 0) {
+    const command = args[0];
 
-  for (const [command, info] of Object.entries(commands())) {
-    process(['echo', 'stdout', `${command} - ${info.description || 'Unknown'}`]);
+    if (commands().hasOwnProperty(command)) {
+      const page = commands()[command];
+      process(['echo', 'stdout', `NAME:            ${command}`]);
+      process(['echo', 'stdout', `                 -----`]);
+
+      if (page.manual) {
+        process(['echo', 'stdout', `DESCRIPTION:     ${page.description || 'Unknown'}`]);
+        process(['echo', 'stdout', `ADDITIONAL INFO: ${page.manual}`]);
+      } else {
+        process(['echo', 'stdout', `DESCRIPTION:     ${page.description || 'Unknown'}`]);
+      }
+
+      process(['echo', 'stdout', `USAGE:           ${page.usage || 'Unknown'}`]);
+    } else {
+      process(['echo', 'stderr', `Unrecognized command '${command}'`]);
+    }
+  } else {
+    process(['echo', 'stderr', 'Not enough args']);
   }
 }
 
 function clear(args) {
   //DESCRIPTION=Clears the screen
+  //USAGE=clear
   process(['echo', 'stdout', '\x1b[c']);
 }
 
 function neofetch(args) {
   //DESCRIPTION=Displays system info
+  //MANUAL=Prints ASCII art, with information including: OS, user/hostname, shell, user agent, resolution, CPU cores, color depth, and the approximate memory (in gigabytes)
+  //USAGE=neofetch
   process(['echo', 'stdout', /*pad*/   `              user@${hostname}`]);
   process(['echo', 'stdout', String.raw`    ___       -----`]);
   process(['echo', 'stdout', String.raw`   |\  \      OS: ${navigator.userAgentData.platform || 'Unknown'}`]);
@@ -32,6 +54,7 @@ function neofetch(args) {
 
 async function exec(args) {
   //DESCRIPTION=Executes inline Javascript
+  //USAGE=exec
   if (args.length !== 0) {
     const code = args.join(' ');
 
@@ -48,15 +71,21 @@ async function exec(args) {
 
 function exit(args) {
   //DESCRIPTION=Exits the shell
+  //USAGE=exit
   window.close();
 }
 
 function uptime(args) {
-  //DESCRIPTION=Returns the uptime (in seconds)
+  //DESCRIPTION=Returns the uptime
+  //MANUAL=It is returned in seconds
+  //USAGE=uptime
   process(['echo', 'stdout', `${(Date.now() - startup) / 1000} seconds`]);
 }
 
 function canvas(args) {
+  //DESCRIPTION=Opens a new canvas window
+  //MANUAL=Provides a way to draw objects to the screen using the <canvas> object
+  //USAGE=canvas <function> <args>;canvas fillStyle <string>
   [name, ...args] = args;
 
   const canvasWindow = window.open('', 'canvasWindow');

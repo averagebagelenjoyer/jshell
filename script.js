@@ -100,7 +100,9 @@ function flushBuffer() {
 let packages = {
   hardcode: {
     echo: {
-      description: 'Echoes a string',
+      description: 'Prints a string',
+      manual: 'Also includes to where',
+      usage: 'echo <stdout | stderr> <string>',
       run: args => {
         const output = args[0];
         const message = args.at(-1);
@@ -121,6 +123,7 @@ let packages = {
     },
     help: {
       description: 'Shows all commands',
+      usage: 'help',
       run: args => {
         for (const [command, info] of Object.entries(commands())) {
           process(['echo', 'stdout', `${command} - ${info.description || 'Unknown'}`]);
@@ -128,7 +131,9 @@ let packages = {
       }
     },
     hide: {
-      description: "Hides the prompt until shown with 'show'. Specify '-c' to disallow breaking out via Ctrl+C",
+      description: 'Hides the prompt',
+      manual: "Specify '-c' to disallow breaking out via Ctrl+C",
+      usage: 'hide [-c]',
       run: args => {
         if (args.includes('-c')) {
           breakWithC = false;
@@ -143,6 +148,7 @@ let packages = {
     },
     show: {
       description: 'Shows the prompt if hidden',
+      usage: 'show',
       run: args => {
         promptElm.hidden = false;
         input.hidden = false;
@@ -152,7 +158,9 @@ let packages = {
       }
     },
     wait: {
-      description: 'Waits a specified amount of time in milliseconds',
+      description: 'Waits a specified amount of time',
+      manual: 'In milliseconds',
+      usage: 'wait <number>',
       run: async args => {
         const duration = args[0];
 
@@ -163,6 +171,8 @@ let packages = {
     },
     aptget: {
       description: 'Downloads a given package',
+      manual: 'Only allows the official repository at the moment, this can be overridden by a variable in the source code',
+      usage: 'aptget <package>',
       run: async args => {
         const pkg = args.join(' ');
 
@@ -185,6 +195,7 @@ let packages = {
     },
     aptunget: {
       description: 'Deletes a given package',
+      usage: 'aptunget <package>',
       run: args => {
         const pkg = args.join(' ');
 
@@ -216,12 +227,16 @@ async function load(pkg, name, system = false) {
 
   for (const func of functions) {
     const funcName = func.match(/(?<=^async function |^function )([a-zA-Z0-9]+)/)[0];
-    const description = func.match(/^ *\/\/DESCRIPTION=(.*)/m);
 
     packages[name][funcName] = {};
-    if (description) {
-      packages[name][funcName].description = description[1];
+
+    for (const metadataName of ['description', 'manual', 'usage']) {
+      const metadata = func.match(RegExp(`^ *//${metadataName.toUpperCase()}=(.*)`, "m"));
+      if (metadata) {
+        packages[name][funcName][metadataName] = metadata[1];
+      }
     }
+
     packages[name][funcName].run = eval(system ? `(${func})` : `
 (args) => {
   const blob = new Blob([\`
