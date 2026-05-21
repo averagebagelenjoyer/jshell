@@ -1,3 +1,7 @@
+const REPOSITORY_PATH = 'repo/';
+// set this to 'repo/' if you are testing local packages
+// default value: https://averagebagelenjoyer.github.io/JShell/repo
+
 const input = document.getElementById('input');
 const logContainer = document.getElementById('log-container');
 const hostname = 'jshell';
@@ -106,11 +110,11 @@ let packages = {
             break;
 
           case 'stderr':
-            screenBuffer += `\x1b[31m${message}\n`;
+            screenBuffer += `\x1b[31mError: ${message}\n`;
             break;
 
           default:
-            screenBuffer += '\x1b[31mInvalid args\n';
+            screenBuffer += '\x1b[31mError: Invalid args\n';
         }
       }
     },
@@ -125,7 +129,7 @@ let packages = {
     hide: {
       description: "Hides the prompt until shown with 'show'. Specify '-c' to disallow breaking out via Ctrl+C",
       run: args => {
-        if (args.includes("-c")) {
+        if (args.includes('-c')) {
           breakWithC = false;
         } else {
           breakWithC = true;
@@ -137,7 +141,7 @@ let packages = {
       }
     },
     show: {
-      description: "Shows the prompt if hidden",
+      description: 'Shows the prompt if hidden',
       run: args => {
         promptElm.hidden = false;
         input.hidden = false;
@@ -147,7 +151,7 @@ let packages = {
       }
     },
     wait: {
-      description: "Waits a specified amount of time in milliseconds",
+      description: 'Waits a specified amount of time in milliseconds',
       run: async args => {
         const duration = args[0];
 
@@ -163,7 +167,7 @@ let packages = {
 
         process(['echo', 'stdout', 'Checking...']);
 
-        const result = await fetch(`https://averagebagelenjoyer.github.io/JShell/repo/${pkg}.js`);
+        const result = await fetch(`${REPOSITORY_PATH}/${pkg}.js`);
 
         if (!result.ok) {
           process(['echo', 'stderr', 'Package not found']);
@@ -184,7 +188,7 @@ let packages = {
         const pkg = args.join(' ');
 
         if (PROTECTED_PACKAGES.includes(pkg)) {
-          process(['echo', 'stderr', `'${pkg}' is a protected package`, 'error']);
+          process(['echo', 'stderr', `'${pkg}' is a protected package`]);
           return;
         }
 
@@ -246,7 +250,7 @@ onmessage = (event) => {
 
 (async () => {
   for (const pkg of ['core', 'core-fs']) {
-    const code = await (await fetch(`https://averagebagelenjoyer.github.io/JShell/repo/${pkg}.js`)).text();
+    const code = await (await fetch(`${REPOSITORY_PATH}/${pkg}.js`)).text();
     load(code, pkg, true);
   }
 })();
@@ -267,7 +271,7 @@ async function process(raw) {
       if (commands().hasOwnProperty(command)) {
         await commands()[command].run(args);
       } else {
-        process(['echo', 'error', `Unrecognized command '${command}'`]);
+        process(['echo', 'stderr', `Unrecognized command '${command}'`]);
       }
     }
 
@@ -282,7 +286,7 @@ document.addEventListener('mouseup', () => {
 document.addEventListener('keydown', (event) => {
   if (promptHidden) {
     if (breakWithC) {
-      if (event.ctrlKey && event.key === "c") {
+      if (event.ctrlKey && event.key === 'c') {
         process(['show']);
       }
     }
