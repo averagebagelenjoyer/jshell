@@ -5,16 +5,23 @@
   cursor: default;
 }
 
+span {
+  white-space: pre-wrap;
+}
+
 input {
+  position: absolute;
   border: none;
   outline: none;
   width: 80%;
+  background: none;
+}
+
+#ghost {
+  opacity: 0.3;
+  user-select: none;
 }
 
 .log {
   white-space: pre-wrap;
-}
-
-.log-error {
-  color: red;
 }

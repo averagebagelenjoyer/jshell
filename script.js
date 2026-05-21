@@ -3,6 +3,7 @@ const REPOSITORY_PATH = 'https://averagebagelenjoyer.github.io/JShell/repo';
 // default value: https://averagebagelenjoyer.github.io/JShell/repo
 
 const input = document.getElementById('input');
+const ghostSuggestion = document.getElementById('ghost');
 const logContainer = document.getElementById('log-container');
 const hostname = 'jshell';
 const startup = Date.now();
@@ -307,6 +308,7 @@ document.addEventListener('keydown', (event) => {
     }
 
     input.value = '';
+    ghostSuggestion.value = '';
   }
 
   if (event.key === 'ArrowUp') {
@@ -339,5 +341,18 @@ document.addEventListener('keydown', (event) => {
     if (matches.length === 1) {
       input.value = matches[0];
     }
+  }
+});
+
+document.addEventListener('input', (event) => {
+  const text = input.value;
+  const matches = Object.keys(commands()).filter(name =>
+    name.startsWith(text)
+  );
+
+  if (matches.length === 1) {
+    ghostSuggestion.value = matches[0];
+  } else {
+    ghostSuggestion.value = '';
   }
 });
