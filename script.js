@@ -333,24 +333,22 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Tab') {
     event.preventDefault();
 
-    const text = input.value;
     const matches = Object.keys(commands()).filter(name =>
-      name.startsWith(text)
+      name.startsWith(input.value)
     );
 
-    if (matches.length === 1) {
+    if (input.value !== '' && matches.length > 0) {
       input.value = matches[0];
     }
   }
 });
 
 document.addEventListener('input', (event) => {
-  const text = input.value;
   const matches = Object.keys(commands()).filter(name =>
-    name.startsWith(text)
+    name.startsWith(input.value)
   );
 
-  if (matches.length === 1) {
+  if (input.value !== '' && matches.length > 0) {
     ghostSuggestion.value = matches[0];
   } else {
     ghostSuggestion.value = '';
