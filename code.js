@@ -163,7 +163,7 @@ let packages = {
 
         process(['echo', 'stdout', 'Checking...']);
 
-        const result = await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${pkg}.js`);
+        const result = await fetch(`https://averagebagelenjoyer.github.io/JShell/repo/${pkg}.js`);
 
         if (!result.ok) {
           process(['echo', 'stderr', 'Package not found']);
@@ -246,7 +246,7 @@ onmessage = (event) => {
 
 (async () => {
   for (const pkg of ['core', 'core-fs']) {
-    const code = await (await fetch(`https://averagebagelenjoyer.github.io/jshell/repo/${pkg}.js`)).text();
+    const code = await (await fetch(`https://averagebagelenjoyer.github.io/JShell/repo/${pkg}.js`)).text();
     load(code, pkg, true);
   }
 })();
