@@ -4,7 +4,8 @@ Try it [here](https://averagebagelenjoyer.github.io/JShell/).
 Or read the documentation for packages [here](https://github.com/averagebagelenjoyer/JShell/wiki).
 
 > [!WARNING]
-> This uses a lot of Chromium specific APIs, and is primarily tested on Google Chrome. Support for other browsers may be limited.
+> This uses a lot of Chromium specific APIs, and is primarily tested on Google Chrome. Support for other browsers may be limited.  
+> Best for Chromebooks in my opinion.
 
 # Features
 - a package manager
@@ -26,8 +27,8 @@ Or read the documentation for packages [here](https://github.com/averagebagelenj
   - [ ] file conversion
 
 # Why?
-Have you ever had to search around for a file converter, or even a damn basic calculator, and end up on some sketchy website which probably sells your data?  
-The point of this project is to ellimate that.
 1. It's universal, so it works everywhere,
 2. It's offline, so you know your data is secure,
 3. It's a shell, of course it's powerful.
+
+the real question is why _not_.

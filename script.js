@@ -1,4 +1,4 @@
-const REPOSITORY_PATH = 'https://averagebagelenjoyer.github.io/JShell/repo';
+const REPOSITORY_PATH = 'repo';
 // set this to 'repo' if you are testing local packages
 // default value: https://averagebagelenjoyer.github.io/JShell/repo
 
@@ -197,9 +197,13 @@ async function load(pkg, name, system = false) {
     packages[name][funcName].run = eval(system ? `(${func})` : `
 (args) => {
   const blob = new Blob([\`
-onmessage = (event) => {
+onmessage = async (event) => {
   const args = event.data;
-  (${func.replace(/[\\`$]/g, '\\$&')})();
+  try {
+    await (${func.replace(/[\\`$]/g, '\\$&')})();
+  } catch (error) {
+    console.error(error);
+  }
   console.log('Goodbye webworker, you will be missed 🫡');
   self.close();
 };
