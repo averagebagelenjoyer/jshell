@@ -1,5 +1,5 @@
 const REPOSITORY_PATH = 'https://averagebagelenjoyer.github.io/JShell/repo';
-// set this to 'repo/' if you are testing local packages
+// set this to 'repo' if you are testing local packages
 // default value: https://averagebagelenjoyer.github.io/JShell/repo
 
 const input = document.getElementById('input');
@@ -81,7 +81,7 @@ function print(text) {
   }
 
   log.innerHTML = text;
-  log.classList.add(`log`);
+  log.classList.add('log');
   logContainer.appendChild(log);
 
   window.scrollTo({
@@ -169,49 +169,6 @@ let packages = {
         }
       }
     },
-    aptget: {
-      description: 'Downloads a given package',
-      manual: 'Only allows the official repository at the moment, this can be overridden by a variable in the source code',
-      usage: 'aptget <package>',
-      run: async args => {
-        const pkg = args.join(' ');
-
-        process(['echo', 'stdout', 'Checking...']);
-
-        const result = await fetch(`${REPOSITORY_PATH}/${pkg}.js`);
-
-        if (!result.ok) {
-          process(['echo', 'stderr', 'Package not found']);
-          return;
-        }
-
-        process(['echo', 'stdout', 'Found!']);
-        process(['echo', 'stdout', 'Downloading...']);
-
-        await load(await result.text(), pkg);
-
-        process(['echo', 'stdout', 'Finished!']);
-      }
-    },
-    aptunget: {
-      description: 'Deletes a given package',
-      usage: 'aptunget <package>',
-      run: args => {
-        const pkg = args.join(' ');
-
-        if (PROTECTED_PACKAGES.includes(pkg)) {
-          process(['echo', 'stderr', `'${pkg}' is a protected package`]);
-          return;
-        }
-
-        if (pkg in packages) {
-          delete packages[pkg];
-          process(['echo', 'stdout', `Successfully deleted '${pkg}'`]);
-        } else {
-          process(['echo', 'stderr', 'Package not found']);
-        }
-      }
-    },
   }
 }
 
@@ -265,7 +222,7 @@ onmessage = (event) => {
 }
 
 (async () => {
-  for (const pkg of ['core', 'core-fs']) {
+  for (const pkg of ['core', 'core-fs', 'core-apt']) {
     const code = await (await fetch(`${REPOSITORY_PATH}/${pkg}.js`)).text();
     load(code, pkg, true);
   }
