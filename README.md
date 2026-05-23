@@ -3,8 +3,8 @@
 Try it [here](https://averagebagelenjoyer.github.io/JShell/).  
 Or read the documentation for packages [here](https://github.com/averagebagelenjoyer/JShell/wiki).
 
-> [!IMPORTANT]
-> Disclaimer: This uses a lot of Chromium specific APIs, and is primarily tested on Google Chrome. Support for other browsers may be limited.
+> [!WARNING]
+> This uses a lot of Chromium specific APIs, and is primarily tested on Google Chrome. Support for other browsers may be limited.
 
 # Features
 - a package manager
